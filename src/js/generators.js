@@ -10,6 +10,10 @@
  */
 export function* characterGenerator(allowedTypes, maxLevel) {
   // TODO: write logic here
+  while (true) {
+    const randIndex = Math.floor(Math.random() * allowedTypes.length);
+    yield new allowedTypes[randIndex](Math.floor(Math.random() * maxLevel) + 1);
+  }
 }
 
 /**
@@ -21,4 +25,11 @@ export function* characterGenerator(allowedTypes, maxLevel) {
  * */
 export function generateTeam(allowedTypes, maxLevel, characterCount) {
   // TODO: write logic here
+  const team = [];
+  const character = characterGenerator(allowedTypes, maxLevel);
+
+  for (let i = 0; i < characterCount; i++) {
+    team.push(character.next(i).value);
+  }
+  return team
 }
