@@ -1,16 +1,36 @@
-/**
- * Класс, представляющий персонажей команды
- *
- * @todo Самостоятельно продумайте хранение персонажей в классе
- * Например
- * @example
- * ```js
- * const characters = [new Swordsman(2), new Bowman(1)]
- * const team = new Team(characters);
- *
- * team.characters // [swordsman, bowman]
- * ```
- * */
+/* eslint-disable no-restricted-syntax */
 export default class Team {
-  // TODO: write your logic here
+  constructor() {
+    this.members = new Set();
+  }
+
+  addChar(characterObj) {
+    const check = this.members.has(characterObj);
+    if (check) {
+      throw new Error('This type character is exists');
+    }
+    this.members.add(characterObj);
+  }
+
+  addAllChars(...args) {
+    args.map((item) => {
+      if (!this.members.has(item)) {
+        return this.members.add(item);
+      }
+    });
+  }
+
+  removeChar(char) {
+    this.members.delete(char);
+  }
+
+  toArray() {
+    return [...this.members];
+  }
+
+  *[Symbol.iterator]() {
+    for (const char of this.members) {
+      yield char;
+    }
+  }
 }
