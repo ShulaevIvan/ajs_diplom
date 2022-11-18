@@ -90,12 +90,29 @@ export default class GameController {
     }
     return position;
   }
-
+  checkSelectedCharPosition(position) {
+    const selected = document.querySelectorAll('.selected')
+    return function () {
+      return position
+    }
+    selected.length > 0 ? false : true
+  }
     // TODO: add event listeners to gamePlay events
     // TODO: load saved stated from stateService
 
   onCellClick(index) {
     // TODO: react to click
+    const checkChar = this.characters.find((item) => item.position === index);
+    const checkCharClass = Boolean(this.playerCharPull.find((item) => checkChar.character instanceof item));
+    
+    if (checkChar && checkCharClass) {
+      this.characters.forEach((item) => {
+        this.gamePlay.deselectCell(item.position);
+      })
+      this.gamePlay.selectCell(index);
+    }
+    
+    
   }
 
   onCellEnter(position) {
