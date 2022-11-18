@@ -1,4 +1,5 @@
 import themes from './themes.js';
+import GamePlay from './GamePlay.js';
 import Bowman from './characters/Bowman.js'
 import Swordsman from './characters/Swordsman.js';
 import Magician from './characters/Magican.js';
@@ -32,10 +33,10 @@ export default class GameController {
     this.aiTeam.addAllChars(...generateTeam(this.enemyCharPull, 3, 4));
     this.createBaseTeamPositions(this.playerTeam, true);
     this.createBaseTeamPositions(this.aiTeam);
-
     this.gamePlay.redrawPositions(this.characters);
-    // TODO: add event listeners to gamePlay events
-    // TODO: load saved stated from stateService
+    this.gamePlay.addCellEnterListener(this.onCellEnter.bind(this));
+    this.gamePlay.addCellLeaveListener(this.onCellLeave.bind(this));
+    this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
   }
 
   setCharPoitions(positions) {
@@ -82,15 +83,40 @@ export default class GameController {
     return this.characters;
   }
 
+  getCharPosition(position) {
+    const checkChar = this.characters.find((item) => item.position === position);
+    if (checkChar) {
+      return checkChar;
+    }
+    return position;
+  }
+
+    // TODO: add event listeners to gamePlay events
+    // TODO: load saved stated from stateService
+
   onCellClick(index) {
     // TODO: react to click
   }
 
-  onCellEnter(index) {
+  onCellEnter(position) {
+    const characterPositionCheck = this.getCharPosition(position);
+
+    if (characterPositionCheck.character) {
+      const character = characterPositionCheck.character;
+      const lvlIcon = '\u{1F396}';
+      const attackIcon = '\u{2694}';
+      const defenceIcon = '\u{1F6E1}';
+      const healthIcon = '\u{2764}';
+      const toolTip = `${lvlIcon} ${character.level} ${attackIcon} ${character.attack} ${defenceIcon} ${character.defence} ${healthIcon} ${character.health}`;
+      this.gamePlay.showCellTooltip(toolTip, position);
+    }
+
     // TODO: react to mouse enter
   }
 
-  onCellLeave(index) {
+  onCellLeave(position) {
+    this.gamePlay.hideCellTooltip(position);
+
     // TODO: react to mouse leave
   }
 }
