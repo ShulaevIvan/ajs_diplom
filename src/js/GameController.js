@@ -12,7 +12,7 @@ import Team from './Team.js';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
-    this.gamePlay = gamePlay;
+    this.gamePlay = gamePlay
     this.stateService = stateService;
     this.playerTeam = new Team();
     this.aiTeam = new Team();
@@ -25,6 +25,7 @@ export default class GameController {
     this.pointsHistory = [];
     this.playerCharPull = [Bowman, Swordsman, Magician];
     this.enemyCharPull = [Daemon, Undead, Vampire];
+    this.selectedCharacters = new Map()
   }
 
   init() {
@@ -40,7 +41,6 @@ export default class GameController {
   }
 
   setCharPoitions(positions) {
-    console.log(positions[-1])
     let position = positions[Math.floor(Math.random() * positions.length)];
     if (this.checkDuplicatePos(position)) {
       return this.setCharPoitions(positions);
@@ -88,37 +88,40 @@ export default class GameController {
     if (checkChar) {
       return checkChar;
     }
-    return position;
-  }
-  checkSelectedCharPosition(position) {
-    const selected = document.querySelectorAll('.selected')
-    return function () {
-      return position
-    }
-    selected.length > 0 ? false : true
   }
     // TODO: add event listeners to gamePlay events
     // TODO: load saved stated from stateService
+  
+  saveSelectedChar(position) {
+    const selectedChar = this.selectedCharacters.get(position)
+    if (selectedChar != undefined) {
+      this.selectedCharacters.clear()
+      return position;
+    }
+  }
 
   onCellClick(index) {
     // TODO: react to click
     const checkChar = this.characters.find((item) => item.position === index);
     const checkCharClass = Boolean(this.playerCharPull.find((item) => checkChar.character instanceof item));
-    
-    if (checkChar && checkCharClass) {
+    const checkCharEnemy = Boolean(this.enemyCharPull.find((item) => checkChar.character instanceof item));
+
+    if (checkChar.character && checkCharClass) {
       this.characters.forEach((item) => {
         this.gamePlay.deselectCell(item.position);
       })
+      this.selectedCharacters.set(index, checkChar.character)
       this.gamePlay.selectCell(index);
+      this.saveSelectedChar(index,  checkChar.character)
+    } else if (checkChar.character && checkCharEnemy) {
+      GamePlay.showError('test');
     }
-    
-    
   }
-
+  
   onCellEnter(position) {
+    // TODO: react to mouse enter
     const characterPositionCheck = this.getCharPosition(position);
-
-    if (characterPositionCheck.character) {
+    if (characterPositionCheck !== undefined) {
       const character = characterPositionCheck.character;
       const lvlIcon = '\u{1F396}';
       const attackIcon = '\u{2694}';
@@ -127,13 +130,10 @@ export default class GameController {
       const toolTip = `${lvlIcon} ${character.level} ${attackIcon} ${character.attack} ${defenceIcon} ${character.defence} ${healthIcon} ${character.health}`;
       this.gamePlay.showCellTooltip(toolTip, position);
     }
-
-    // TODO: react to mouse enter
   }
 
   onCellLeave(position) {
-    this.gamePlay.hideCellTooltip(position);
-
     // TODO: react to mouse leave
+    this.gamePlay.hideCellTooltip(position);
   }
 }
