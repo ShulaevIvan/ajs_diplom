@@ -102,18 +102,18 @@ export default class GameController {
 
   onCellClick(index) {
     // TODO: react to click
-    const checkChar = this.characters.find((item) => item.position === index);
-    const checkCharClass = Boolean(this.playerCharPull.find((item) => checkChar.character instanceof item));
-    const checkCharEnemy = Boolean(this.enemyCharPull.find((item) => checkChar.character instanceof item));
+    const checkChar = this.characters.find((item) => item.position === index && item.character != undefined);
+    const checkCharClass = Boolean(this.playerCharPull.find((item) => checkChar?.character && checkChar.character instanceof item));
+    const checkCharEnemy = Boolean(this.enemyCharPull.find((item) => checkChar?.character && checkChar.character instanceof item ));
 
-    if (checkChar.character && checkCharClass) {
+    if (checkChar?.character && checkCharClass) {
       this.characters.forEach((item) => {
         this.gamePlay.deselectCell(item.position);
       })
       this.selectedCharacters.set(index, checkChar.character)
       this.gamePlay.selectCell(index);
       this.saveSelectedChar(index,  checkChar.character)
-    } else if (checkChar.character && checkCharEnemy) {
+    } else if (checkChar?.character && checkCharEnemy) {
       GamePlay.showError('test');
     }
   }
