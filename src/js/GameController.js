@@ -9,6 +9,8 @@ import Vampire from './characters/Vampire.js';
 import generateTeam  from './generators.js';
 import PositionedCharacter from './PositionedCharacter.js';
 import Team from './Team.js';
+import cursors from './cursors.js';
+import Character from './Character.js';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -92,17 +94,14 @@ export default class GameController {
     // TODO: add event listeners to gamePlay events
     // TODO: load saved stated from stateService
   
-  saveSelectedChar(position) {
+  checkSelectedChar(position) {
     const selectedChar = this.selectedCharacters.get(position)
-    if (selectedChar != undefined) {
-      this.selectedCharacters.clear()
-      return position;
-    }
+    return position;
   }
 
   onCellClick(index) {
     // TODO: react to click
-    const checkChar = this.characters.find((item) => item.position === index && item.character != undefined);
+    const checkChar = this.characters.find((item) => item.position === index && item?.character);
     const checkCharClass = Boolean(this.playerCharPull.find((item) => checkChar?.character && checkChar.character instanceof item));
     const checkCharEnemy = Boolean(this.enemyCharPull.find((item) => checkChar?.character && checkChar.character instanceof item ));
 
@@ -110,19 +109,26 @@ export default class GameController {
       this.characters.forEach((item) => {
         this.gamePlay.deselectCell(item.position);
       })
+      this.selectedCharacters.clear()
       this.selectedCharacters.set(index, checkChar.character)
       this.gamePlay.selectCell(index);
-      this.saveSelectedChar(index,  checkChar.character)
     } else if (checkChar?.character && checkCharEnemy) {
       GamePlay.showError('test');
     }
+
   }
   
   onCellEnter(position) {
     // TODO: react to mouse enter
-    const characterPositionCheck = this.getCharPosition(position);
-    if (characterPositionCheck !== undefined) {
-      const character = characterPositionCheck.character;
+    this.gamePlay.setCursor(cursors.auto);
+    const charPosCheck = this.getCharPosition(position);
+    let selectedChar = undefined;
+    let checkEnemy = Boolean(this.enemyCharPull.find((item) => charPosCheck?.character && charPosCheck.character instanceof item ))
+    for (let [key] of this.selectedCharacters) {
+      selectedChar = key;
+    }
+    if (charPosCheck !== undefined) {
+      const character = charPosCheck.character;
       const lvlIcon = '\u{1F396}';
       const attackIcon = '\u{2694}';
       const defenceIcon = '\u{1F6E1}';
@@ -130,10 +136,26 @@ export default class GameController {
       const toolTip = `${lvlIcon} ${character.level} ${attackIcon} ${character.attack} ${defenceIcon} ${character.defence} ${healthIcon} ${character.health}`;
       this.gamePlay.showCellTooltip(toolTip, position);
     }
+
+    if (charPosCheck?.character && charPosCheck.character instanceof Character) {
+      this.gamePlay.setCursor(cursors.pointer);
+    }
+    else if (charPosCheck !== position && selectedChar && !checkEnemy) {
+      this.gamePlay.setCursor(cursors.pointer);
+      this.gamePlay.selectCell(position, 'green')
+    }
+    if (checkEnemy && selectedChar) {
+      this.gamePlay.setCursor(cursors.crosshair);
+      this.gamePlay.selectCell(position, 'red')
+    }
+    console.log(checkEnemy)
+    console.log(selectedChar)
   }
+
 
   onCellLeave(position) {
     // TODO: react to mouse leave
     this.gamePlay.hideCellTooltip(position);
+    this.gamePlay.setCursor(cursors.auto)
   }
 }
