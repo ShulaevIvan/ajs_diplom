@@ -20,14 +20,13 @@ export default class GameController {
     this.aiTeam = new Team();
     this.characters = [];
     this.counter = 0;
-    this.indexChar = null;
-    this.indexCursor = null;
+    this.positionCursor = undefined;
     this.gameLevel = 1;
     this.points = 0;
     this.pointsHistory = [];
     this.playerCharPull = [Bowman, Swordsman, Magician];
     this.enemyCharPull = [Daemon, Undead, Vampire];
-    this.selectedCharacters = new Map()
+    this.selectedCharacters = new Map();
   }
 
   init() {
@@ -104,6 +103,7 @@ export default class GameController {
     const checkChar = this.characters.find((item) => item.position === index && item?.character);
     const checkCharClass = Boolean(this.playerCharPull.find((item) => checkChar?.character && checkChar.character instanceof item));
     const checkCharEnemy = Boolean(this.enemyCharPull.find((item) => checkChar?.character && checkChar.character instanceof item ));
+    const selectetChar = this.selectedCharacters.keys().next().value
 
     if (checkChar?.character && checkCharClass) {
       this.characters.forEach((item) => {
@@ -115,18 +115,22 @@ export default class GameController {
     } else if (checkChar?.character && checkCharEnemy) {
       GamePlay.showError('test');
     }
+    this.checkCharacterDistance(selectetChar, index)
 
   }
   
   onCellEnter(position) {
     // TODO: react to mouse enter
     this.gamePlay.setCursor(cursors.auto);
+    this.gamePlay.deselectCell(position)
+    
     const charPosCheck = this.getCharPosition(position);
     let selectedChar = undefined;
     let checkEnemy = Boolean(this.enemyCharPull.find((item) => charPosCheck?.character && charPosCheck.character instanceof item ))
     for (let [key] of this.selectedCharacters) {
       selectedChar = key;
     }
+
     if (charPosCheck !== undefined) {
       const character = charPosCheck.character;
       const lvlIcon = '\u{1F396}';
@@ -137,25 +141,48 @@ export default class GameController {
       this.gamePlay.showCellTooltip(toolTip, position);
     }
 
-    if (charPosCheck?.character && charPosCheck.character instanceof Character) {
+    if (charPosCheck?.character && charPosCheck?.character instanceof Character) {
       this.gamePlay.setCursor(cursors.pointer);
     }
     else if (charPosCheck !== position && selectedChar && !checkEnemy) {
       this.gamePlay.setCursor(cursors.pointer);
       this.gamePlay.selectCell(position, 'green')
     }
-    if (checkEnemy && selectedChar) {
+    if (checkEnemy && selectedChar >= 0) {
       this.gamePlay.setCursor(cursors.crosshair);
       this.gamePlay.selectCell(position, 'red')
     }
-    console.log(checkEnemy)
-    console.log(selectedChar)
   }
-
 
   onCellLeave(position) {
     // TODO: react to mouse leave
-    this.gamePlay.hideCellTooltip(position);
-    this.gamePlay.setCursor(cursors.auto)
+    const selectedCharacter = Number(this.selectedCharacters.keys().next().value);
+    if (this.positionCursor != selectedCharacter && selectedCharacter >= 0) {
+      this.gamePlay.deselectCell(position)
+      this.gamePlay.selectCell(selectedCharacter)
+    }
+  }
+
+  checkCharacterDistance(position, clickedPosition) {
+    const selectedCharacter = Array.from(this.selectedCharacters.keys())[0];
+    if (position != undefined && selectedCharacter != clickedPosition) {
+      let oneCell = []
+      let left = position - 1
+      let right = position + 1
+      let up = position + 8
+      let down = position - 8
+      let diogonal1 = position - 9
+      let diogonal2 = position + 9
+      let diogonal3 = position + 7
+      let diogonal4 = position - 7
+      oneCell.push(left, right, up, down, diogonal1, diogonal2, diogonal3, diogonal4)
+      let test =  oneCell.find((item) => {
+        return item == clickedPosition
+      })
+      this.gamePlay.selectCell(test, 'red')
+    }
+   
+    
+    
   }
 }
