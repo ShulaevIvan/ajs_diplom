@@ -124,8 +124,23 @@ export default class GameController {
       return 1
     }
   }
-    // TODO: add event listeners to gamePlay events
-    // TODO: load saved stated from stateService
+
+  attackFunc(charObj, target) {
+    const targetObj = this.characters.find((item) => item.position == target)
+    const targetIndex = this.characters.indexOf(targetObj)
+    const dmg = Math.max(charObj.attack - targetObj.character.defence, charObj.attack * 0.1)
+    this.characters[targetIndex].character.health -= dmg
+    this.gamePlay.redrawPositions(this.characters);
+
+    this.gamePlay.showDamage(target, dmg).then(() => {
+
+    if (this.characters[targetIndex].character.health <= 0) {
+      this.characters.splice(targetIndex, 1);
+      this.gamePlay.redrawPositions(this.characters);
+    }
+  });
+  }
+
 
   onCellClick(index) {
     // TODO: react to click
@@ -134,21 +149,27 @@ export default class GameController {
     const checkCharEnemy = Boolean(this.enemyCharPull.find((item) => checkChar?.character && checkChar.character instanceof item ));
     const charDistance = this.getCharClassDistance(this.selectedCharacters);
     const charMovePoints = this.getAvalibleMove(Array.from(this.selectedCharacters.keys())[0], charDistance);
+    const charAttackDist = this.getCharAttackRange(this.selectedCharacters);
+    const charAttackRange = this.getAvalibleMove(Array.from(this.selectedCharacters.keys())[0], charAttackDist);
     this.characters.forEach((item) => {
       this.gamePlay.deselectCell(item.position);
     })
-
     if (checkChar?.character && checkCharClass) {
       this.selectedCharacters.clear();
       this.selectedCharacters.set(index, checkChar.character);
       this.gamePlay.selectCell(Array.from(this.selectedCharacters.keys())[0])
     } 
-    if (checkChar?.character && checkCharEnemy) {
+    if (checkChar?.character && checkCharEnemy && !charAttackRange.includes(index)) {
       GamePlay.showError('test');
+    }
+    else if (checkChar?.character && checkCharEnemy && charAttackRange.includes(index)) {
+     this.attackFunc(Array.from(this.selectedCharacters.values())[0], index)
+
     }
     if (!this.characters.includes(this.getCharPosition(index)) && charMovePoints.includes(index)) {
       this.moveChar(index);
     }
+
   }
   
   onCellEnter(position) {
