@@ -11,7 +11,6 @@ import PositionedCharacter from './PositionedCharacter.js';
 import Team from './Team.js';
 import cursors from './cursors.js';
 import Character from './Character.js';
-import Deamon from './characters/Deamon.js';
 
 export default class GameController {
   constructor(gamePlay, stateService) {
@@ -87,11 +86,21 @@ export default class GameController {
       return checkChar;
     }
   }
+  moveChar(clickedPosition) {
+    this.characters.forEach((item) => {
+      if (item.position == Array.from(this.selectedCharacters.keys())[0]) {
+        item.position = clickedPosition;
+        this.gamePlay.redrawPositions(this.characters);
+        let a = this.characters.find((char) => char.position == clickedPosition)
+        this.gamePlay.selectCell(a.position)
+      }
+    })
+  }
   getCharClassDistance(character) {
-    const charObj = {}
-    charObj['position'] = Array.from(character.keys())[0]
-    charObj['type'] = Array.from(character.values())[0]
-    if (charObj.type  instanceof Magician || charObj.type instanceof Deamon) {
+    const charObj = {};
+    charObj['position'] = Array.from(character.keys())[0];
+    charObj['type'] = Array.from(character.values())[0];
+    if (charObj.type  instanceof Magician || charObj.type instanceof Daemon) {
       return 1
     }
     else if (charObj.type instanceof Bowman || charObj.type instanceof Vampire) {
@@ -99,6 +108,20 @@ export default class GameController {
     }
     else if (charObj.type instanceof Swordsman || charObj.type  instanceof Undead) {
       return 4
+    }
+  }
+  getCharAttackRange(character) {
+    const charObj = {};
+    charObj['position'] = Array.from(character.keys())[0];
+    charObj['type'] = Array.from(character.values())[0];
+    if (charObj.type  instanceof Magician || charObj.type instanceof Daemon) {
+      return 4
+    }
+    else if (charObj.type instanceof Bowman || charObj.type instanceof Vampire) {
+      return 2
+    }
+    else if (charObj.type instanceof Swordsman || charObj.type  instanceof Undead) {
+      return 1
     }
   }
     // TODO: add event listeners to gamePlay events
@@ -109,29 +132,36 @@ export default class GameController {
     const checkChar = this.characters.find((item) => item.position === index && item?.character);
     const checkCharClass = Boolean(this.playerCharPull.find((item) => checkChar?.character && checkChar.character instanceof item));
     const checkCharEnemy = Boolean(this.enemyCharPull.find((item) => checkChar?.character && checkChar.character instanceof item ));
-
+    const charDistance = this.getCharClassDistance(this.selectedCharacters);
+    const charMovePoints = this.getAvalibleMove(Array.from(this.selectedCharacters.keys())[0], charDistance);
+    this.characters.forEach((item) => {
+      this.gamePlay.deselectCell(item.position);
+    })
 
     if (checkChar?.character && checkCharClass) {
-      this.characters.forEach((item) => {
-        this.gamePlay.deselectCell(item.position);
-      })
-      this.selectedCharacters.clear()
-      this.selectedCharacters.set(index, checkChar.character)
-      this.gamePlay.selectCell(index);
-    } else if (checkChar?.character && checkCharEnemy) {
+      this.selectedCharacters.clear();
+      this.selectedCharacters.set(index, checkChar.character);
+      this.gamePlay.selectCell(Array.from(this.selectedCharacters.keys())[0])
+    } 
+    if (checkChar?.character && checkCharEnemy) {
       GamePlay.showError('test');
     }
-  
-
+    if (!this.characters.includes(this.getCharPosition(index)) && charMovePoints.includes(index)) {
+      this.moveChar(index);
+    }
   }
   
   onCellEnter(position) {
     // TODO: react to mouse enter
     const charPosCheck = this.getCharPosition(position);
-    let checkEnemy = Boolean(this.enemyCharPull.find((item) => charPosCheck?.character && charPosCheck.character instanceof item ))
-    let checkPlayer = Boolean(this.playerCharPull.find((item) => charPosCheck?.character && charPosCheck.character instanceof item ))
+    const checkEnemy = Boolean(this.enemyCharPull.find((item) => charPosCheck?.character && charPosCheck.character instanceof item ))
+    const checkPlayer = Boolean(this.playerCharPull.find((item) => charPosCheck?.character && charPosCheck.character instanceof item ))
     const charDistance = this.getCharClassDistance(this.selectedCharacters);
     const charMovePoints = this.getAvalibleMove(Array.from(this.selectedCharacters.keys())[0], charDistance);
+    const charAttackDist = this.getCharAttackRange(this.selectedCharacters);
+    const charAttackRange = this.getAvalibleMove(Array.from(this.selectedCharacters.keys())[0], charAttackDist);
+
+    this.gamePlay.setCursor(cursors.auto);
 
     if (charPosCheck !== undefined) {
       const character = charPosCheck.character;
@@ -142,32 +172,28 @@ export default class GameController {
       const toolTip = `${lvlIcon} ${character.level} ${attackIcon} ${character.attack} ${defenceIcon} ${character.defence} ${healthIcon} ${character.health}`;
       this.gamePlay.showCellTooltip(toolTip, position);
     }
-    this.gamePlay.setCursor(cursors.auto);
-    this.gamePlay.deselectCell(position);
 
     if (charPosCheck?.character && charPosCheck?.character instanceof Character) {
       this.gamePlay.setCursor(cursors.pointer);
     }
     else if (charPosCheck != position && !checkEnemy && charMovePoints.includes(position)) {
       this.gamePlay.setCursor(cursors.pointer);
-      this.gamePlay.selectCell(position, 'green')
+      this.gamePlay.selectCell(position, 'green');
     }
-    if (checkEnemy && charMovePoints.includes(position)) {
+    if(checkEnemy && charAttackRange.includes(position)) {
       this.gamePlay.setCursor(cursors.crosshair);
-      this.gamePlay.selectCell(position, 'red')
+      this.gamePlay.selectCell(position, 'red');
     }
-    if (charPosCheck != position && !charMovePoints.includes(position) && !checkPlayer) {
-      console.log(charMovePoints)
+    else if (charPosCheck != position && !charMovePoints.includes(position) && !checkPlayer && !charAttackRange.includes(position)) {
       this.gamePlay.setCursor(cursors.notallowed);
-    }
-    if (this.selectedCharacters.size > 0) {
-      this.gamePlay.selectCell(Array.from(this.selectedCharacters.keys())[0])
     }
   }
 
   onCellLeave(position) {
-    // TODO: react to mouse leave
     this.gamePlay.deselectCell(position)
+    if (Array.from(this.selectedCharacters.keys())[0] == position) {
+      this.gamePlay.selectCell(position)
+    }
   }
   getAvalibleMove(charPosition, distance) {
     const moveArr = [];
@@ -177,7 +203,8 @@ export default class GameController {
       for (let y = 0; y <= distance * 2; y += 1) {
         if (Math.trunc(n / 8) === Math.trunc(x / 8) && n >= 0 && n <= 63) {
           moveArr.push(n++);
-        } else { n++; }
+        } 
+        else { n++; }
       }
     }
     return moveArr;
