@@ -1,13 +1,16 @@
+/* eslint-disable no-unused-expressions */
+/* eslint no-unused-expressions: "error" */
+/* eslint no-sequences: "error" */
 import Character from '../Character';
 
 export default class Vampire extends Character {
   constructor(level) {
     super(level);
-    this.type ='vampire',
+    this.type = 'vampire',
     this.attack = 35,
     this.defence = 15,
-    this.player ='ai',
+    this.player = 'ai',
     this.stepsRadius = 2,
-    this.attackRadius = 2
+    this.attackRadius = 2;
   }
 }

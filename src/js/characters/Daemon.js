@@ -1,13 +1,15 @@
+/* eslint-disable no-unused-expressions */
+/* eslint no-unused-expressions: "error" */
 import Character from '../Character';
 
 export default class Daemon extends Character {
   constructor(level) {
     super(level);
-    this.type ='daemon',
+    this.type = 'daemon',
     this.attack = 100,
     this.defence = 40,
-    this.player ='ai',
+    this.player = 'ai',
     this.stepsRadius = 1,
-    this.attackRadius = 4
+    this.attackRadius = 4;
   }
 }

@@ -11,12 +11,12 @@ export default class GameState {
   }
 
   constructor(stage, teams, motion, scores) {
-    this.stage = stage; 
-    this.teams = teams; 
+    this.stage = stage;
+    this.teams = teams;
     this.motion = motion;
-    this.scores = scores || 0; 
-    this.availableSteps = null; 
-    this.availableAttack = null; 
+    this.scores = scores || 0;
+    this.availableSteps = null;
+    this.availableAttack = null;
     this.selectedCharacter = null;
   }
 

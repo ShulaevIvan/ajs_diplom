@@ -114,12 +114,7 @@ export default class GameController {
     const character = this.gameState.teams.find((elem) => elem.position === position);
 
     if (character) {
-      const ctool = character.character
-      const lvlIcon = '\u{1F396}';
-      const attackIcon = '\u{2694}';
-      const defenceIcon = '\u{1F6E1}';
-      const healthIcon = '\u{2764}';
-      const toolTip = `${lvlIcon} ${ctool.level} ${attackIcon} ${ctool.attack} ${defenceIcon} ${ctool.defence} ${healthIcon} ${ctool.health}`;
+      const toolTip = this.constructor.toolTipTemplate.call(this, character.character);
       this.gamePlay.showCellTooltip(toolTip, position);
     }
     this.activateCursor(character);
@@ -182,7 +177,6 @@ export default class GameController {
       this.gamePlay.addCellClickListener(this.onCellClick.bind(this));
     }
     const totalScores = this.gameState ? this.gameState.scores : 0;
-    console.log(totalScores)
     this.gameState = new GameState(1, [], side.USER, totalScores);
     this.nextLevel(this.gameState.stage);
   }
@@ -277,5 +271,14 @@ export default class GameController {
       this.checkLevel();
       this.gamePlay.redrawPositions(this.gameState.teams);
     }
+  }
+  static toolTipTemplate(character) {
+    const {
+      level,
+      health,
+      attack,
+      defence,
+    } = character;
+    return `\u{1F396} ${level} \u{2694} ${attack} \u{1F6E1} ${defence} \u{2764} ${health}`;
   }
 }
