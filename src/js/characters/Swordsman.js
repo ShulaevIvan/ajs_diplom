@@ -1,10 +1,13 @@
 import Character from '../Character';
 
 export default class Swordsman extends Character {
-    constructor(level, type='swordsman') {
-        super(level)
-        this.type = type
-        this.attack = 40;
-        this.defence = 10;
-    }
+  constructor(level) {
+    super(level);
+    this.type ='swordsman',
+    this.attack = 50,
+    this.defence = 25,
+    this.player ='player',
+    this.stepsRadius = 4,
+    this.attackRadius = 1
+  }
 }

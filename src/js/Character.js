@@ -1,29 +1,16 @@
-/**
- * Базовый класс, от которого наследуются классы персонажей
- * @property level - уровень персонажа, от 1 до 4
- * @property attack - показатель атаки
- * @property defence - показатель защиты
- * @property health - здоровье персонажа
- * @property type - строка с одним из допустимых значений:
- * swordsman
- * bowman
- * magician
- * daemon
- * undead
- * vampire
- */
 export default class Character {
-  constructor(level, type = 'generic') {
-    this.level = level;
-    this.attack = 0;
-    this.defence = 0;
-    this.health = 50;
-    this.type = type;
-    
+  constructor(level, attack, defence, player, stepsRadius, attackRadius) {
+    this.level = level; 
+    this.attack = attack; 
+    this.defence = defence;
+    this.health = 100;
+    this.player = player;
+    this.stepsRadius = stepsRadius; 
+    this.attackRadius = attackRadius;
+
+    // TODO: throw error if user use "new Character()"
     if (new.target.name === 'Character') {
-      throw new Error(
-        `err, ......`
-      );
+      throw new Error('err ....');
     }
   }
 }

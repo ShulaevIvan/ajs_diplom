@@ -1,22 +1,42 @@
 export default class GameState {
   static from(object) {
-    this.level = object.level;
-    this.character = object.character;
-    this.step = object.step;
-    this.state = object.state;
-    this.possibleMoves = object.possibleMoves;
-    this.possibleAttack = object.possibleAttack;
-    this.itemPlayer = object.itemPlayer;
-    this.itemComputer = object.itemComputer;
-    this.scores = object.scores;
-    this.maxLevel = object.maxLevel;
-    this.saveGame = [{
-      level: this.level,
-      character: this.character,
-      step: this.step,
-      scores: this.scores,
-      maxLevel: this.maxLevel,
-    }];
-    return null;
+    // TODO: create object
+    const {
+      stage,
+      teams,
+      motion,
+      scores,
+    } = object;
+    return new GameState(stage, teams, motion, scores);
+  }
+
+  constructor(stage, teams, motion, scores) {
+    this.stage = stage; 
+    this.teams = teams; 
+    this.motion = motion;
+    this.scores = scores || 0; 
+    this.availableSteps = null; 
+    this.availableAttack = null; 
+    this.selectedCharacter = null;
+  }
+
+  clear() {
+    this.availableSteps = null;
+    this.availableAttack = null;
+    this.selectedCharacter = null;
+  }
+
+  removeHero(index) {
+    this.teams = this.teams.filter((member) => member.position !== index);
+  }
+
+  addScores() {
+    const sum = this.teams.reduce((acc, member) => {
+      if (member.character.player === 'player') {
+        return acc + member.character.health;
+      }
+      return acc;
+    }, 0);
+    this.scores += sum;
   }
 }
