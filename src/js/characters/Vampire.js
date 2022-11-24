@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-expressions */
 /* eslint no-unused-expressions: "error" */
-/* eslint no-sequences: "error" */
 import Character from '../Character';
 
 export default class Vampire extends Character {
