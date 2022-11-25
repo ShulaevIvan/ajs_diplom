@@ -98,7 +98,7 @@ export default class GameController {
       }
       return;
     }
-    // Сообщения об ошибке
+
     if (!this.gameState.selectedCharacter && character && character.character.player === side.ai) {
       let { type } = character.character;
       type = type[0].toUpperCase() + type.slice(1);
@@ -241,7 +241,7 @@ export default class GameController {
     const damage = 2 * Math.round(Math.max((attack - defense, attack * 0.1)));
     attackedCharacter.health -= damage;
     if (attacked.character.health <= 0) {
-      this.gameState.removeHero(indexAttacked);
+      this.gameState.removeCharacter(indexAttacked);
     }
     this.gamePlay.selectCell(attacker.position);
     this.gamePlay.selectCell(attacked.position, 'red');

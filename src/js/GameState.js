@@ -26,7 +26,7 @@ export default class GameState {
     this.selectedCharacter = null;
   }
 
-  removeHero(index) {
+  removeCharacter(index) {
     this.teams = this.teams.filter((member) => member.position !== index);
   }
 
