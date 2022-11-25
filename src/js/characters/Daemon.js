@@ -5,8 +5,8 @@ export default class Daemon extends Character {
   constructor(level) {
     super(level);
     this.type = 'daemon',
-    this.attack = 40,
-    this.defence = 10,
+    this.attack = 10,
+    this.defence = 40,
     this.player = 'ai',
     this.stepsRadius = 1,
     this.attackRadius = 4;
