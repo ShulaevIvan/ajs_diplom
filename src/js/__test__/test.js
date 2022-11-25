@@ -19,7 +19,7 @@ test.each([
 
 test('test create character', () => {
   function fn() {
-    Character();
+    new Character();
   }
   expect(fn).toThrowError('err ....');
 });
