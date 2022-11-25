@@ -1,3 +1,4 @@
+/* eslint-disable */
 const MinCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 

@@ -1,17 +1,20 @@
-/* eslint-disable max-len */
+/* eslint-disable */
 import themes from './themes';
 import GameState from './GameState';
 import PositionedCharacter from './PositionedCharacter';
 import Bowman from './characters/Bowman';
 import Daemon from './characters/Daemon';
-import Magician from './characters//Magician';
+import Magician from './characters/Magician';
 import Swordsman from './characters/Swordsman';
 import Undead from './characters/Undead';
 import Vampire from './characters/Vampire';
 import side from './checkSide';
-import { startFieldGenerator, getAvalibleMove, getCharAttackRange,} from './generators';
-import generateTeam  from './generators';
+/* eslint-disable */
+import { startFieldGenerator, getAvalibleMove, getCharAttackRange } from './generators';
+import generateTeam from './generators';
 import cursors from './cursors';
+/* eslint-enable */
+/* eslint-disable max-len */
 
 const playerCharPull = [Swordsman, Bowman, Magician];
 const enemyCharPull = [Daemon, Undead, Vampire];
@@ -50,6 +53,7 @@ export default class GameController {
       parameter.attack = Math.floor(Math.max(parameter.attack, parameter.attack * (0.8 + parameter.health / 100)));
     }
   }
+
   static clearLocalStorage(clearParam) {
     localStorage.removeItem(clearParam);
   }
@@ -79,7 +83,6 @@ export default class GameController {
       return;
     }
 
-   
     if (this.gameState.selectedCharacter) {
       if (this.gameState.availableSteps.includes(position) && !character) {
         this.gamePlay.deselectCell(this.gameState.selectedCharacter.position);
@@ -99,7 +102,7 @@ export default class GameController {
     if (!this.gameState.selectedCharacter && character && character.character.player === side.ai) {
       let { type } = character.character;
       type = type[0].toUpperCase() + type.slice(1);
-      this.gamePlay.showPopup(`Ошибка, это персонаж противника`);
+      this.gamePlay.showPopup('Ошибка, это персонаж противника');
     }
   }
 
@@ -123,6 +126,7 @@ export default class GameController {
       this.selectCharacterCursor(position, character);
     }
   }
+
   activateCursor(character) {
     if (character) {
       const pointer = character.character.player === side.USER ? cursors.pointer : cursors.notallowed;
@@ -230,7 +234,6 @@ export default class GameController {
     }
   }
 
-  
   async attackFunc(attacked, attacker, indexAttacked) {
     const { attack } = attacker.character;
     const { defense } = attacked.character;
@@ -272,6 +275,7 @@ export default class GameController {
       this.gamePlay.redrawPositions(this.gameState.teams);
     }
   }
+
   static toolTipTemplate(character) {
     const {
       level,

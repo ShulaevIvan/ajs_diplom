@@ -202,6 +202,7 @@ export default class GamePlay {
       throw new Error('GamePlay not bind to DOM');
     }
   }
+
   closePopup() {
     this.popup.classList.add('popup_hidden');
   }
